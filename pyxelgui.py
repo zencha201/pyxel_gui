@@ -203,7 +203,7 @@ class PyxelGui(Widget):
         pass
     
     def draw_widget(self):
-        pyxel.cls(pyxel.COLOR_BLACK)
+        pyxel.cls(pyxel.COLOR_GRAY)
 
 class Window(Widget):
     '''
@@ -217,8 +217,10 @@ class Window(Widget):
         pass
     
     def draw_widget(self):
-        pyxel.rect(self.own.x + self.x, self.own.y + self.y, self.w, self.h, pyxel.COLOR_WHITE)
-        pyxel.text(self.own.x + self.x + 2, self.own.y + self.y + 2, f'[ {self.text} ]', pyxel.COLOR_BLACK)
+        pyxel.rect(self.own.x + self.x, self.own.y + self.y, self.w, self.h, pyxel.COLOR_BLACK)
+        pyxel.rect(self.own.x + self.x + 1, self.own.y + self.y + 1, self.w - 2, self.h - 2, pyxel.COLOR_LIGHT_BLUE)
+        pyxel.rect(self.own.x + self.x + 2, self.own.y + self.y + 2, self.w - 4, self.h - 4, pyxel.COLOR_WHITE)
+        pyxel.text(self.own.x + self.x + 2, self.own.y + self.y + 3, f'[ {self.text} ]', pyxel.COLOR_BLACK)
 
 class Image(Widget):
     '''
@@ -265,18 +267,20 @@ class Button(Widget):
         
     def update_widget(self):
         # サイズの自動調整 (ざっくり)
-        self.w = len(self.text) * 4 + 4
-        self.h = 9
+        self.w = len(self.text) * 4 + 5
+        self.h = 11
     
     def draw_widget(self):
         if self.is_mouse_down:
-            pyxel.rect(self.own.x + self.x, self.own.y + self.y, self.w, self.h, pyxel.COLOR_NAVY)
-            pyxel.rectb(self.own.x + self.x, self.own.y + self.y, self.w, self.h, pyxel.COLOR_BLACK)
-            pyxel.text(self.own.x + self.x + 2, self.own.y + self.y + 2, self.text, pyxel.COLOR_WHITE)
+            pyxel.rect(self.own.x + self.x, self.own.y + self.y, self.w, self.h, pyxel.COLOR_BLACK)
+            pyxel.rect(self.own.x + self.x + 1, self.own.y + self.y + 1, self.w - 2, self.h - 2, pyxel.COLOR_DARK_BLUE)
+            pyxel.rect(self.own.x + self.x + 2, self.own.y + self.y + 2, self.w - 4, self.h - 4, pyxel.COLOR_NAVY)
+            pyxel.text(self.own.x + self.x + 3, self.own.y + self.y + 3, self.text, pyxel.COLOR_WHITE)
         else:
-            pyxel.rect(self.own.x + self.x, self.own.y + self.y, self.w, self.h, pyxel.COLOR_WHITE)
-            pyxel.rectb(self.own.x + self.x, self.own.y + self.y, self.w, self.h, pyxel.COLOR_BLACK)
-            pyxel.text(self.own.x + self.x + 2, self.own.y + self.y + 2, self.text, pyxel.COLOR_BLACK)
+            pyxel.rect(self.own.x + self.x, self.own.y + self.y, self.w, self.h, pyxel.COLOR_BLACK)
+            pyxel.rect(self.own.x + self.x + 1, self.own.y + self.y + 1, self.w - 2, self.h - 2, pyxel.COLOR_LIGHT_BLUE)
+            pyxel.rect(self.own.x + self.x + 2, self.own.y + self.y + 2, self.w - 4, self.h - 4, pyxel.COLOR_WHITE)
+            pyxel.text(self.own.x + self.x + 3, self.own.y + self.y + 3, self.text, pyxel.COLOR_BLACK)
 
 class Text(Widget):
     '''
