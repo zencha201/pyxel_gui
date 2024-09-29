@@ -4,33 +4,100 @@ class Widget:
     '''
     ウィジェットのベースクラス
     '''
-    def __init__(self):
-        self.x = 0
-        self.y = 0
-        self.w = 32
-        self.h = 32
+    def __init__(self, x, y, w, h):
+        self.x = x
+        self.y = y
+        self.w = w
+        self.h = h
         self.enable = True
         self.visible = True
         self.own = None
         self.widgets = []
-        self.on_update = None
+    
+    def on_focus(self):
+        '''
+        フォーカスイベントハンドラ
+        '''
+        pass
+    
+    def on_unfocus(self):
+        '''
+        フォーカス解除イベントハンドラ
+        '''
+        pass
+    
+    def on_key_down(self, key):
+        '''
+        キーダウンイベントハンドラ
+        '''
+        pass
+    
+    def on_key_up(self, key):
+        '''
+        キーアップイベントハンドラ
+        '''
+        pass
+    
+    def on_key_press(self, key):
+        '''
+        キー押下イベントハンドラ
+        '''
+        pass
+    
+    def on_mouse_move(self, x, y):
+        '''
+        マウス移動イベントハンドラ
+        '''
+        for widget in self.widgets:
+            if widget.x <= x and widget.y <= y and widget.x + widget.w >= x and widget.y + widget.h >= y:
+                widget.on_mouse_move(x - widget.x, y - widget.y)
+    
+    def on_mouse_down(self, btn, x, y):
+        '''
+        マウスボタンダウンイベントハンドラ
+        '''
+        for widget in self.widgets:
+            if widget.x <= x and widget.y <= y and widget.x + widget.w >= x and widget.y + widget.h >= y:
+                widget.on_mouse_down(btn, x - widget.x, y - widget.y)
+                widget.on_click(btn)
+    
+    def on_mouse_up(self, btn, x, y):
+        '''
+        マウスボタンアップイベントハンドラ
+        '''
+        for widget in self.widgets:
+            if widget.x <= x and widget.y <= y and widget.x + widget.w >= x and widget.y + widget.h >= y:
+                widget.on_mouse_up(btn, x - widget.x, y - widget.y)
+    
+    def on_update(self):
         '''
         更新イベントハンドラ
         '''
-        self.on_draw = None
+        pass
+    
+    def on_draw(self):
         '''
         描画イベントハンドラ
         '''
-        self.on_click = None
+        pass
+    
+    def on_click(self, btn):
         '''
         クリックイベントハンドラ
         '''
+        pass
         
     def append(self, widget):
+        '''
+        ウィジェット追加
+        '''
         self.widgets.append(widget)
         widget.own = self
     
     def remove(self, widget):
+        '''
+        ウィジェット削除
+        '''
         self.widgets.remove(widget)
         widget.own = None
     
@@ -53,8 +120,7 @@ class Widget:
         '''
         if self.enable:
             self.update_widget()
-            if self.on_update != None:
-                self.on_update(sender=self)
+            self.on_update()
             for widget in self.widgets:
                 widget.update()
     
@@ -82,8 +148,7 @@ class Widget:
             pyxel.clip(ox + self.x, oy + self.y, self.w, self.h)
             
             self.draw_widget()
-            if self.on_draw != None:
-                self.on_draw(sender=self)
+            self.on_draw()
             for widget in self.widgets:
                 widget.draw()
                 
@@ -96,15 +161,43 @@ class PyxelGui(Widget):
     イベント配送処理は本関数内に実装する
     '''
     def __init__(self, pyxel_ref):
-        super().__init__()
         global pyxel
         pyxel = pyxel_ref
+        super().__init__(0, 0, pyxel.width, pyxel.height)
+        pyxel.mouse(True)
+        
+        # マウスイベント関係
+        self.mouse_x = pyxel.mouse_x
+        self.mouse_y = pyxel.mouse_y
+        self.mouse_btn = {pyxel.MOUSE_BUTTON_LEFT : False, 
+                          pyxel.MOUSE_BUTTON_MIDDLE : False, 
+                          pyxel.MOUSE_BUTTON_RIGHT : False}
+    
+    def detect_mouse_event(self):
+        # マウスイベント
+        current_mouse_x = pyxel.mouse_x
+        current_mouse_y = pyxel.mouse_y
+        if self.mouse_x != current_mouse_x or self.mouse_y != current_mouse_y:
+            self.on_mouse_move(self.mouse_x, self.mouse_y)
+        self.mouse_x = current_mouse_x
+        self.mouse_y = current_mouse_y
+        
+        cureent_mouse_btn = {}
+        for key in self.mouse_btn.keys():
+            cureent_mouse_btn[key] = pyxel.btn(key)
+            if self.mouse_btn[key] != cureent_mouse_btn[key]:
+                if cureent_mouse_btn[key]:
+                    self.on_mouse_down(key, self.mouse_x, self.mouse_y)
+                else:
+                    self.on_mouse_up(key, self.mouse_x, self.mouse_y)
+            self.mouse_btn[key] = cureent_mouse_btn[key]
         
     def update_widget(self):
-        # ToDo イベント検出処理と配送処理を実装する
-        # イベント検出処理
-        
-        # イベント配送処理
+        '''
+        イベント処理
+        '''
+        # イベント検出処理 / 配送処理
+        self.detect_mouse_event()
         
         # フォーカス処理
         pass
@@ -116,8 +209,8 @@ class Window(Widget):
     '''
     ウィンドウ
     '''
-    def __init__(self, text):
-        super().__init__()
+    def __init__(self, text, x=0, y=0, w=100, h=80, color=0):
+        super().__init__(x, y, w, h)
         self.text = text
         
     def update_widget(self):
@@ -132,7 +225,7 @@ class Image(Widget):
     イメージ
     '''
     def __init__(self):
-        super().__init__()
+        super().__init__(0, 0, 0, 0)
         
     def update_widget(self):
         pass
@@ -144,9 +237,31 @@ class Button(Widget):
     '''
     ボタン
     '''
-    def __init__(self, text):
-        super().__init__()
+    def __init__(self, text, x=0, y=0, w=10, h=10, color=0):
+        super().__init__(x, y, w, h)
         self.text = text
+        self.is_mouse_down = False
+    
+    def on_unfocus(self):
+        '''
+        フォーカス解除イベントハンドラ
+        '''
+        super().on_unfocus()
+        self.is_mouse_down = False
+    
+    def on_mouse_down(self, btn, x, y):
+        '''
+        マウスボタンダウンイベントハンドラ
+        '''
+        super().on_mouse_down(btn, x, y)
+        self.is_mouse_down = True
+    
+    def on_mouse_up(self, btn, x, y):
+        '''
+        マウスボタンアップイベントハンドラ
+        '''
+        super().on_mouse_up(btn, x, y)
+        self.is_mouse_down = False
         
     def update_widget(self):
         # サイズの自動調整 (ざっくり)
@@ -154,16 +269,23 @@ class Button(Widget):
         self.h = 9
     
     def draw_widget(self):
-        pyxel.rectb(self.own.x + self.x, self.own.y + self.y, self.w, self.h, pyxel.COLOR_BLACK)
-        pyxel.text(self.own.x + self.x + 2, self.own.y + self.y + 2, self.text, pyxel.COLOR_BLACK)
+        if self.is_mouse_down:
+            pyxel.rect(self.own.x + self.x, self.own.y + self.y, self.w, self.h, pyxel.COLOR_NAVY)
+            pyxel.rectb(self.own.x + self.x, self.own.y + self.y, self.w, self.h, pyxel.COLOR_BLACK)
+            pyxel.text(self.own.x + self.x + 2, self.own.y + self.y + 2, self.text, pyxel.COLOR_WHITE)
+        else:
+            pyxel.rect(self.own.x + self.x, self.own.y + self.y, self.w, self.h, pyxel.COLOR_WHITE)
+            pyxel.rectb(self.own.x + self.x, self.own.y + self.y, self.w, self.h, pyxel.COLOR_BLACK)
+            pyxel.text(self.own.x + self.x + 2, self.own.y + self.y + 2, self.text, pyxel.COLOR_BLACK)
 
 class Text(Widget):
     '''
     テキスト
     '''
-    def __init__(self, text):
-        super().__init__()
+    def __init__(self, text, x=0, y=0, w=10, h=10, color=0):
+        super().__init__(x, y, w, h)
         self.text = text
+        self.color = color
         
     def update_widget(self):
         # サイズの自動調整 (ざっくり)
@@ -171,4 +293,4 @@ class Text(Widget):
         self.h = 9
     
     def draw_widget(self):
-        pyxel.text(self.own.x + self.x, self.own.y + self.y, self.text, pyxel.COLOR_BLACK)
+        pyxel.text(self.own.x + self.x, self.own.y + self.y, self.text, self.color)
