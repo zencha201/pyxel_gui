@@ -14,8 +14,17 @@ class Widget:
         self.own = None
         self.widgets = []
         self.on_update = None
+        '''
+        更新イベントハンドラ
+        '''
         self.on_draw = None
+        '''
+        描画イベントハンドラ
+        '''
         self.on_click = None
+        '''
+        クリックイベントハンドラ
+        '''
         
     def append(self, widget):
         self.widgets.append(widget)
@@ -67,11 +76,19 @@ class Widget:
         3. サブウィジェットの描画処理
         '''
         if self.visible:
+            # 描画範囲をウイジェットの領域内に限定
+            ox = self.own.x if self.own != None else 0
+            oy = self.own.y if self.own != None else 0
+            pyxel.clip(ox + self.x, oy + self.y, self.w, self.h)
+            
             self.draw_widget()
             if self.on_draw != None:
                 self.on_draw(sender=self)
             for widget in self.widgets:
                 widget.draw()
+                
+            # 描画範囲をリセット
+            pyxel.clip()
 
 class PyxelGui(Widget):
     '''
@@ -84,6 +101,12 @@ class PyxelGui(Widget):
         pyxel = pyxel_ref
         
     def update_widget(self):
+        # ToDo イベント検出処理と配送処理を実装する
+        # イベント検出処理
+        
+        # イベント配送処理
+        
+        # フォーカス処理
         pass
     
     def draw_widget(self):
@@ -93,14 +116,16 @@ class Window(Widget):
     '''
     ウィンドウ
     '''
-    def __init__(self):
+    def __init__(self, text):
         super().__init__()
+        self.text = text
         
     def update_widget(self):
         pass
     
     def draw_widget(self):
         pyxel.rect(self.own.x + self.x, self.own.y + self.y, self.w, self.h, pyxel.COLOR_WHITE)
+        pyxel.text(self.own.x + self.x + 2, self.own.y + self.y + 2, f'[ {self.text} ]', pyxel.COLOR_BLACK)
 
 class Image(Widget):
     '''
@@ -124,13 +149,11 @@ class Button(Widget):
         self.text = text
         
     def update_widget(self):
-        pass
-    
-    def draw_widget(self):
-        # ボタンサイズの自動調整
+        # サイズの自動調整 (ざっくり)
         self.w = len(self.text) * 4 + 4
         self.h = 9
-        
+    
+    def draw_widget(self):
         pyxel.rectb(self.own.x + self.x, self.own.y + self.y, self.w, self.h, pyxel.COLOR_BLACK)
         pyxel.text(self.own.x + self.x + 2, self.own.y + self.y + 2, self.text, pyxel.COLOR_BLACK)
 
@@ -143,7 +166,9 @@ class Text(Widget):
         self.text = text
         
     def update_widget(self):
-        pass
+        # サイズの自動調整 (ざっくり)
+        self.w = len(self.text) * 4 + 4
+        self.h = 9
     
     def draw_widget(self):
         pyxel.text(self.own.x + self.x, self.own.y + self.y, self.text, pyxel.COLOR_BLACK)
