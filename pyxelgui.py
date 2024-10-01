@@ -264,7 +264,7 @@ class Window(Widget):
             self.y = pyxel.mouse_y - self.drag_start_mouse_y
     
     def draw_widget(self):
-        pyxel.rect(self.get_abs_x(), self.get_abs_y(), self.w, self.h, pyxel.COLOR_BLACK)
+        pyxel.rect(self.get_abs_x(), self.get_abs_y(), self.w, self.h, pyxel.COLOR_DARK_BLUE)
         pyxel.rect(self.get_abs_x() + 1, self.get_abs_y() + 1, self.w - 2, self.h - 2, pyxel.COLOR_LIGHT_BLUE)
         pyxel.rect(self.get_abs_x() + 2, self.get_abs_y() + 2, self.w - 4, self.h - 4, pyxel.COLOR_WHITE)
         pyxel.text(self.get_abs_x() + 2, self.get_abs_y() + 3, f'[ {self.text} ]', pyxel.COLOR_BLACK)
@@ -273,8 +273,8 @@ class Image(Widget):
     '''
     イメージ
     '''
-    def __init__(self):
-        super().__init__(0, 0, 0, 0)
+    def __init__(self, x=0, y=0, w=10, h=10):
+        super().__init__(x, y, w, h)
         
     def update_widget(self):
         pass
@@ -325,12 +325,12 @@ class Button(Widget):
     
     def draw_widget(self):
         if self.is_mouse_down:
-            pyxel.rect(self.get_abs_x(), self.get_abs_y(), self.w, self.h, pyxel.COLOR_BLACK)
-            pyxel.rect(self.get_abs_x() + 1, self.get_abs_y() + 1, self.w - 2, self.h - 2, pyxel.COLOR_DARK_BLUE)
-            pyxel.rect(self.get_abs_x() + 2, self.get_abs_y() + 2, self.w - 4, self.h - 4, pyxel.COLOR_NAVY)
+            pyxel.rect(self.get_abs_x(), self.get_abs_y(), self.w, self.h, pyxel.COLOR_DARK_BLUE)
+            pyxel.rect(self.get_abs_x() + 1, self.get_abs_y() + 1, self.w - 2, self.h - 2, pyxel.COLOR_NAVY)
+            pyxel.rect(self.get_abs_x() + 2, self.get_abs_y() + 2, self.w - 4, self.h - 4, pyxel.COLOR_BLACK)
             pyxel.text(self.get_abs_x() + 3, self.get_abs_y() + 3, self.text, pyxel.COLOR_WHITE)
         else:
-            pyxel.rect(self.get_abs_x(), self.get_abs_y(), self.w, self.h, pyxel.COLOR_BLACK)
+            pyxel.rect(self.get_abs_x(), self.get_abs_y(), self.w, self.h, pyxel.COLOR_DARK_BLUE)
             pyxel.rect(self.get_abs_x() + 1, self.get_abs_y() + 1, self.w - 2, self.h - 2, pyxel.COLOR_LIGHT_BLUE)
             pyxel.rect(self.get_abs_x() + 2, self.get_abs_y() + 2, self.w - 4, self.h - 4, pyxel.COLOR_WHITE)
             pyxel.text(self.get_abs_x() + 3, self.get_abs_y() + 3, self.text, pyxel.COLOR_BLACK)

@@ -27,11 +27,19 @@ def on_mouse_click_button(self, btn):
 button.on_click = on_mouse_click_button.__get__(button, Button)
 window.append(widget=button)
 
-window2 = Window('MAIN WINDOW2', 20, 100, 100, 50)
+window2 = Window('MAIN WINDOW2', 20, 100, 100, 100)
 def update_window2(self):
     self.x += 0.1
 window2.on_update = update_window2.__get__(window2, Window)
 gui.append(widget=window2)
+
+image1 = Image(10, 10, 50, 50)
+def draw_widget_image1(self):
+    base_x = self.get_abs_x()
+    base_y = self.get_abs_y()
+    pyxel.rect(base_x + 0, base_y + 0, 50, 50, pyxel.COLOR_BROWN)
+image1.draw_widget = draw_widget_image1.__get__(image1, Image)
+window2.append(widget=image1)
 
 def update():
     '''
