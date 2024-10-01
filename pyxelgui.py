@@ -14,6 +14,18 @@ class Widget:
         self.own = None
         self.widgets = []
     
+    def get_abs_x(self):
+        '''
+        ウィジェットの絶対X座標を取得する
+        '''
+        return self.x + self.own.get_abs_x() if self.own != None else 0
+    
+    def get_abs_y(self):
+        '''
+        ウィジェットの絶対Y座標を取得する
+        '''
+        return self.y + self.own.get_abs_y() if self.own != None else 0
+    
     def on_focus(self):
         '''
         フォーカスイベントハンドラ
@@ -143,9 +155,7 @@ class Widget:
         '''
         if self.visible:
             # 描画範囲をウイジェットの領域内に限定
-            ox = self.own.x if self.own != None else 0
-            oy = self.own.y if self.own != None else 0
-            pyxel.clip(ox + self.x, oy + self.y, self.w, self.h)
+            pyxel.clip(self.get_abs_x(), self.get_abs_y(), self.w, self.h)
             
             self.draw_widget()
             self.on_draw()
@@ -212,15 +222,52 @@ class Window(Widget):
     def __init__(self, text, x=0, y=0, w=100, h=80, color=0):
         super().__init__(x, y, w, h)
         self.text = text
+        self.is_drag = False
+        self.drag_start_mouse_x = 0
+        self.drag_start_mouse_y = 0
+    
+    def on_mouse_move(self, x, y):
+        '''
+        マウス移動イベントハンドラ
+        '''
+        if self.is_drag:
+            pass
+        else:
+            super().on_mouse_move(x, y)
+    
+    def on_mouse_down(self, btn, x, y):
+        '''
+        マウスボタンダウンイベントハンドラ
+        '''
+        # ドラッグモード判定
+        if y < 8:
+            self.is_drag = True
+            # マウスカーソル位置(X,Y)とウィンドウの起点(X,Y)の差を記録する
+            self.drag_start_mouse_x = pyxel.mouse_x - self.get_abs_x()
+            self.drag_start_mouse_y = pyxel.mouse_y - self.get_abs_y()
+        else:
+            super().on_mouse_down(btn, x, y)
+    
+    def on_mouse_up(self, btn, x, y):
+        '''
+        マウスボタンアップイベントハンドラ
+        '''
+        # ドラッグモード解除判定
+        if self.is_drag == True:
+            self.is_drag = False
+        else:
+            super().on_mouse_up(btn, x, y)
         
     def update_widget(self):
-        pass
+        if self.is_drag:
+            self.x = pyxel.mouse_x - self.drag_start_mouse_x
+            self.y = pyxel.mouse_y - self.drag_start_mouse_y
     
     def draw_widget(self):
-        pyxel.rect(self.own.x + self.x, self.own.y + self.y, self.w, self.h, pyxel.COLOR_BLACK)
-        pyxel.rect(self.own.x + self.x + 1, self.own.y + self.y + 1, self.w - 2, self.h - 2, pyxel.COLOR_LIGHT_BLUE)
-        pyxel.rect(self.own.x + self.x + 2, self.own.y + self.y + 2, self.w - 4, self.h - 4, pyxel.COLOR_WHITE)
-        pyxel.text(self.own.x + self.x + 2, self.own.y + self.y + 3, f'[ {self.text} ]', pyxel.COLOR_BLACK)
+        pyxel.rect(self.get_abs_x(), self.get_abs_y(), self.w, self.h, pyxel.COLOR_BLACK)
+        pyxel.rect(self.get_abs_x() + 1, self.get_abs_y() + 1, self.w - 2, self.h - 2, pyxel.COLOR_LIGHT_BLUE)
+        pyxel.rect(self.get_abs_x() + 2, self.get_abs_y() + 2, self.w - 4, self.h - 4, pyxel.COLOR_WHITE)
+        pyxel.text(self.get_abs_x() + 2, self.get_abs_y() + 3, f'[ {self.text} ]', pyxel.COLOR_BLACK)
 
 class Image(Widget):
     '''
@@ -271,22 +318,22 @@ class Button(Widget):
         self.h = 11
         
         # ボタン範囲外移動判定
-        if self.own.x + self.x <= pyxel.mouse_x and self.own.y + self.y <= pyxel.mouse_y and self.own.x + self.x + self.w >= pyxel.mouse_x and self.own.y + self.y + self.h >= pyxel.mouse_y:
+        if self.get_abs_x() <= pyxel.mouse_x and self.get_abs_y() <= pyxel.mouse_y and self.get_abs_x() + self.w >= pyxel.mouse_x and self.get_abs_y() + self.h >= pyxel.mouse_y:
             pass
         else:
             self.is_mouse_down = False
     
     def draw_widget(self):
         if self.is_mouse_down:
-            pyxel.rect(self.own.x + self.x, self.own.y + self.y, self.w, self.h, pyxel.COLOR_BLACK)
-            pyxel.rect(self.own.x + self.x + 1, self.own.y + self.y + 1, self.w - 2, self.h - 2, pyxel.COLOR_DARK_BLUE)
-            pyxel.rect(self.own.x + self.x + 2, self.own.y + self.y + 2, self.w - 4, self.h - 4, pyxel.COLOR_NAVY)
-            pyxel.text(self.own.x + self.x + 3, self.own.y + self.y + 3, self.text, pyxel.COLOR_WHITE)
+            pyxel.rect(self.get_abs_x(), self.get_abs_y(), self.w, self.h, pyxel.COLOR_BLACK)
+            pyxel.rect(self.get_abs_x() + 1, self.get_abs_y() + 1, self.w - 2, self.h - 2, pyxel.COLOR_DARK_BLUE)
+            pyxel.rect(self.get_abs_x() + 2, self.get_abs_y() + 2, self.w - 4, self.h - 4, pyxel.COLOR_NAVY)
+            pyxel.text(self.get_abs_x() + 3, self.get_abs_y() + 3, self.text, pyxel.COLOR_WHITE)
         else:
-            pyxel.rect(self.own.x + self.x, self.own.y + self.y, self.w, self.h, pyxel.COLOR_BLACK)
-            pyxel.rect(self.own.x + self.x + 1, self.own.y + self.y + 1, self.w - 2, self.h - 2, pyxel.COLOR_LIGHT_BLUE)
-            pyxel.rect(self.own.x + self.x + 2, self.own.y + self.y + 2, self.w - 4, self.h - 4, pyxel.COLOR_WHITE)
-            pyxel.text(self.own.x + self.x + 3, self.own.y + self.y + 3, self.text, pyxel.COLOR_BLACK)
+            pyxel.rect(self.get_abs_x(), self.get_abs_y(), self.w, self.h, pyxel.COLOR_BLACK)
+            pyxel.rect(self.get_abs_x() + 1, self.get_abs_y() + 1, self.w - 2, self.h - 2, pyxel.COLOR_LIGHT_BLUE)
+            pyxel.rect(self.get_abs_x() + 2, self.get_abs_y() + 2, self.w - 4, self.h - 4, pyxel.COLOR_WHITE)
+            pyxel.text(self.get_abs_x() + 3, self.get_abs_y() + 3, self.text, pyxel.COLOR_BLACK)
 
 class Text(Widget):
     '''
@@ -303,4 +350,4 @@ class Text(Widget):
         self.h = 9
     
     def draw_widget(self):
-        pyxel.text(self.own.x + self.x, self.own.y + self.y, self.text, self.color)
+        pyxel.text(self.get_abs_x(), self.get_abs_y(), self.text, self.color)

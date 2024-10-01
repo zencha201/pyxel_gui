@@ -15,7 +15,7 @@ window = Window('MAIN WINDOW', 20, 20, 100, 50)
 gui.append(widget=window)
 
 count = 0
-text = Text('test', 5, 15, color=pyxel.COLOR_RED)
+text = Text('test', 5, 15, color=pyxel.COLOR_BLACK)
 window.append(widget=text)
 
 button = Button('CLICK', 10, 30)
@@ -23,6 +23,7 @@ def on_mouse_click_button(self, btn):
     global count
     count += 1
     text.text = f'{count}'
+    text.color = pyxel.COLOR_RED
 button.on_click = on_mouse_click_button.__get__(button, Button)
 window.append(widget=button)
 
