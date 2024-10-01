@@ -269,6 +269,12 @@ class Button(Widget):
         # サイズの自動調整 (ざっくり)
         self.w = len(self.text) * 4 + 5
         self.h = 11
+        
+        # ボタン範囲外移動判定
+        if self.own.x + self.x <= pyxel.mouse_x and self.own.y + self.y <= pyxel.mouse_y and self.own.x + self.x + self.w >= pyxel.mouse_x and self.own.y + self.y + self.h >= pyxel.mouse_y:
+            pass
+        else:
+            self.is_mouse_down = False
     
     def draw_widget(self):
         if self.is_mouse_down:
