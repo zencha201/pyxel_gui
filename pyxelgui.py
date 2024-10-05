@@ -14,9 +14,10 @@ class Widget:
         self.h = h
         self.enable = True
         self.visible = True
+        self.focus = False
         self.own = None
-        self.widgets = []
-    
+        self.widgets = [] # ウィジェットリスト。Zオーダー奥順
+            
     def get_abs_x(self):
         '''
         ウィジェットの絶対X座標を取得する
@@ -33,13 +34,13 @@ class Widget:
         '''
         フォーカスイベントハンドラ
         '''
-        pass
+        self.focus = True
     
     def on_unfocus(self):
         '''
         フォーカス解除イベントハンドラ
         '''
-        pass
+        self.focus = False
     
     def on_key_down(self, key):
         '''
@@ -187,6 +188,24 @@ class PyxelGui(Widget):
                           pyxel.MOUSE_BUTTON_MIDDLE : False, 
                           pyxel.MOUSE_BUTTON_RIGHT : False}
     
+    def on_mouse_down(self, btn, x, y):
+        '''
+        マウスボタンダウンイベントハンドラ
+        PyxelGuiのみ、ウィンドウのフォーカス遷移を行うため、独自実装とする
+        '''
+        for widget in self.widgets[::-1]:
+            if widget.x <= x and widget.y <= y and widget.x + widget.w >= x and widget.y + widget.h >= y:
+                # 2番目以降のウィンドウの場合、フォーカス切り替え処理を行う
+                if self.widgets[-1] != widget: # 2番目以降のウィンドウ
+                    self.widgets[-1].on_unfocus()
+                    widget.on_focus()
+                    self.widgets.remove(widget)
+                    self.widgets.append(widget)
+                
+                widget.on_mouse_down(btn, x - widget.x, y - widget.y)
+                widget.on_click(btn)
+                break
+    
     def detect_mouse_event(self):
         # マウスイベント
         current_mouse_x = pyxel.mouse_x
@@ -268,8 +287,12 @@ class Window(Widget):
             self.y = pyxel.mouse_y - self.drag_start_mouse_y
     
     def draw_widget(self):
-        pyxel.rect(self.get_abs_x(), self.get_abs_y(), self.w, self.h, pyxel.COLOR_DARK_BLUE)
-        pyxel.rect(self.get_abs_x() + 1, self.get_abs_y() + 1, self.w - 2, self.h - 2, pyxel.COLOR_LIGHT_BLUE)
+        if self.focus:
+            pyxel.rect(self.get_abs_x(), self.get_abs_y(), self.w, self.h, pyxel.COLOR_DARK_BLUE)
+            pyxel.rect(self.get_abs_x() + 1, self.get_abs_y() + 1, self.w - 2, self.h - 2, pyxel.COLOR_LIGHT_BLUE)
+        else:
+            pyxel.rect(self.get_abs_x(), self.get_abs_y(), self.w, self.h, pyxel.COLOR_DARK_BLUE)
+            pyxel.rect(self.get_abs_x() + 1, self.get_abs_y() + 1, self.w - 2, self.h - 2, pyxel.COLOR_WHITE)
         pyxel.rect(self.get_abs_x() + 2, self.get_abs_y() + 2, self.w - 4, self.h - 4, pyxel.COLOR_WHITE)
         pyxel.text(self.get_abs_x() + 2, self.get_abs_y() + 3, f'[ {self.text} ]', pyxel.COLOR_BLACK)
 
