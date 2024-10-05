@@ -184,12 +184,12 @@ class PyxelGui(Widget):
     画面構成上のトップレイヤー
     イベント配送処理は本関数内に実装する
     '''
-    def __init__(self, pyxel_ref=None, font_size=10):
+    def __init__(self, pyxel_ref=None, mouse=True, font_size=10):
         if pyxel_ref != None:
             global pyxel
             pyxel = pyxel_ref
         super().__init__(0, 0, pyxel.width, pyxel.height)
-        pyxel.mouse(True)
+        pyxel.mouse(mouse)
         
         # フォント処理
         global _font
@@ -428,7 +428,7 @@ if __name__ == '__main__':
     # Pyxel初期化
     pyxel.init(256,256)
     # PyxelGUI初期化
-    gui = PyxelGui(pyxel_ref=pyxel, font_size=12)
+    gui = PyxelGui(pyxel_ref=pyxel, mouse=True, font_size=12)
 
     # ウィジェット生成
     window = Window('MAIN WINDOW', 20, 20, 120, 70)
@@ -447,7 +447,7 @@ if __name__ == '__main__':
     button.on_click = on_mouse_click_button.__get__(button, Button)
     window.append(widget=button)
 
-    window2 = Window('', 20, 100, 100, 100)
+    window2 = Window('MAIN WINDOW2', 20, 100, 100, 100)
     def update_window2(self):
         self.x += 0.1
     window2.on_update = update_window2.__get__(window2, Window)
