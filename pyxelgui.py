@@ -3,8 +3,9 @@ if __name__ == '__main__':
 else:
     pyxel = None
 
+# フォント関係設定 (PyxelGuiのコンストラクタで設定)
 _font = None
-
+_FONT_NAME = ""
 _FONT_SIZE = 10
 _FONT_WIDTH_ASCII = 6
 _FONT_WIDTH_2BYTE = 10
@@ -183,7 +184,7 @@ class PyxelGui(Widget):
     画面構成上のトップレイヤー
     イベント配送処理は本関数内に実装する
     '''
-    def __init__(self, pyxel_ref=None):
+    def __init__(self, pyxel_ref=None, font_size=10):
         if pyxel_ref != None:
             global pyxel
             pyxel = pyxel_ref
@@ -192,7 +193,29 @@ class PyxelGui(Widget):
         
         # フォント処理
         global _font
-        _font = pyxel.Font("assets/umplus_j10r.bdf")
+        global _FONT_NAME
+        global _FONT_SIZE
+        global _FONT_WIDTH_ASCII
+        global _FONT_WIDTH_2BYTE
+        global _WINDOW_TITLE_BAR_SIZE
+        global _TEXT_HEIGHT
+        global _BUTTON_HEIGHT
+        if font_size == 12:
+            # フォントサイズ：12
+            _FONT_NAME = "assets/umplus_j12r.bdf"
+            _FONT_SIZE = 12
+            _FONT_WIDTH_ASCII = 8
+            _FONT_WIDTH_2BYTE = 12
+        else:
+            # フォントサイズ：10
+            _FONT_NAME = "assets/umplus_j10r.bdf"
+            _FONT_SIZE = 10
+            _FONT_WIDTH_ASCII = 6
+            _FONT_WIDTH_2BYTE = 10
+        _WINDOW_TITLE_BAR_SIZE = _FONT_SIZE + 4
+        _TEXT_HEIGHT = _FONT_SIZE + 7
+        _BUTTON_HEIGHT = _TEXT_HEIGHT
+        _font = pyxel.Font(_FONT_NAME)
         
         # マウスイベント関係
         self.mouse_x = pyxel.mouse_x
@@ -405,10 +428,10 @@ if __name__ == '__main__':
     # Pyxel初期化
     pyxel.init(256,256)
     # PyxelGUI初期化
-    gui = PyxelGui(pyxel_ref=pyxel)
+    gui = PyxelGui(pyxel_ref=pyxel, font_size=12)
 
     # ウィジェット生成
-    window = Window('MAIN WINDOW', 20, 20, 100, 50)
+    window = Window('MAIN WINDOW', 20, 20, 120, 70)
     gui.append(widget=window)
 
     count = 0
