@@ -3,6 +3,15 @@ if __name__ == '__main__':
 else:
     pyxel = None
 
+_font = None
+
+_FONT_SIZE = 10
+_FONT_WIDTH_ASCII = 6
+_FONT_WIDTH_2BYTE = 10
+_WINDOW_TITLE_BAR_SIZE = _FONT_SIZE + 4
+_TEXT_HEIGHT = _FONT_SIZE + 7
+_BUTTON_HEIGHT = _TEXT_HEIGHT
+
 class Widget:
     '''
     ウィジェットのベースクラス
@@ -181,6 +190,10 @@ class PyxelGui(Widget):
         super().__init__(0, 0, pyxel.width, pyxel.height)
         pyxel.mouse(True)
         
+        # フォント処理
+        global _font
+        _font = pyxel.Font("assets/umplus_j10r.bdf")
+        
         # マウスイベント関係
         self.mouse_x = pyxel.mouse_x
         self.mouse_y = pyxel.mouse_y
@@ -262,8 +275,8 @@ class Window(Widget):
         '''
         マウスボタンダウンイベントハンドラ
         '''
-        # ドラッグモード判定
-        if y < 8:
+        # タイトルバーがある場合、ドラッグモード判定
+        if len(self.text) > 0 and y < _WINDOW_TITLE_BAR_SIZE:
             self.is_drag = True
             # マウスカーソル位置(X,Y)とウィンドウの起点(X,Y)の差を記録する
             self.drag_start_mouse_x = pyxel.mouse_x - self.get_abs_x()
@@ -294,7 +307,9 @@ class Window(Widget):
             pyxel.rect(self.get_abs_x(), self.get_abs_y(), self.w, self.h, pyxel.COLOR_DARK_BLUE)
             pyxel.rect(self.get_abs_x() + 1, self.get_abs_y() + 1, self.w - 2, self.h - 2, pyxel.COLOR_WHITE)
         pyxel.rect(self.get_abs_x() + 2, self.get_abs_y() + 2, self.w - 4, self.h - 4, pyxel.COLOR_WHITE)
-        pyxel.text(self.get_abs_x() + 2, self.get_abs_y() + 3, f'[ {self.text} ]', pyxel.COLOR_BLACK)
+        
+        if len(self.text) > 0: # タイトルバー有無判定
+            pyxel.text(self.get_abs_x() + 2, self.get_abs_y() + 2, f'[ {self.text} ]', pyxel.COLOR_BLACK, _font)
 
 class Image(Widget):
     '''
@@ -341,8 +356,11 @@ class Button(Widget):
         
     def update_widget(self):
         # サイズの自動調整 (ざっくり)
-        self.w = len(self.text) * 4 + 5
-        self.h = 11
+        #self.w = len(self.text) * _FONT_WIDTH + 5
+        self.w = 5
+        for t in self.text:
+            self.w += _FONT_WIDTH_ASCII if t.isascii() else _FONT_WIDTH_2BYTE
+        self.h = _BUTTON_HEIGHT
         
         # ボタン範囲外移動判定
         if self.get_abs_x() <= pyxel.mouse_x and self.get_abs_y() <= pyxel.mouse_y and self.get_abs_x() + self.w >= pyxel.mouse_x and self.get_abs_y() + self.h >= pyxel.mouse_y:
@@ -355,12 +373,12 @@ class Button(Widget):
             pyxel.rect(self.get_abs_x(), self.get_abs_y(), self.w, self.h, pyxel.COLOR_DARK_BLUE)
             pyxel.rect(self.get_abs_x() + 1, self.get_abs_y() + 1, self.w - 2, self.h - 2, pyxel.COLOR_NAVY)
             pyxel.rect(self.get_abs_x() + 2, self.get_abs_y() + 2, self.w - 4, self.h - 4, pyxel.COLOR_BLACK)
-            pyxel.text(self.get_abs_x() + 3, self.get_abs_y() + 3, self.text, pyxel.COLOR_WHITE)
+            pyxel.text(self.get_abs_x() + 3, self.get_abs_y() + 3, self.text, pyxel.COLOR_WHITE, _font)
         else:
             pyxel.rect(self.get_abs_x(), self.get_abs_y(), self.w, self.h, pyxel.COLOR_DARK_BLUE)
             pyxel.rect(self.get_abs_x() + 1, self.get_abs_y() + 1, self.w - 2, self.h - 2, pyxel.COLOR_LIGHT_BLUE)
             pyxel.rect(self.get_abs_x() + 2, self.get_abs_y() + 2, self.w - 4, self.h - 4, pyxel.COLOR_WHITE)
-            pyxel.text(self.get_abs_x() + 3, self.get_abs_y() + 3, self.text, pyxel.COLOR_BLACK)
+            pyxel.text(self.get_abs_x() + 3, self.get_abs_y() + 3, self.text, pyxel.COLOR_BLACK, _font)
 
 class Text(Widget):
     '''
@@ -373,11 +391,14 @@ class Text(Widget):
         
     def update_widget(self):
         # サイズの自動調整 (ざっくり)
-        self.w = len(self.text) * 4 + 4
-        self.h = 9
+        #self.w = len(self.text) * _FONT_WIDTH + 5
+        self.w = 5
+        for t in self.text:
+            self.w += _FONT_WIDTH_ASCII if t.isascii() else _FONT_WIDTH_2BYTE
+        self.h = _TEXT_HEIGHT
     
     def draw_widget(self):
-        pyxel.text(self.get_abs_x(), self.get_abs_y(), self.text, self.color)
+        pyxel.text(self.get_abs_x(), self.get_abs_y(), self.text, self.color, _font)
 
 # テストコード
 if __name__ == '__main__':
@@ -394,22 +415,22 @@ if __name__ == '__main__':
     text = Text('test', 5, 15, color=pyxel.COLOR_BLACK)
     window.append(widget=text)
 
-    button = Button('CLICK', 10, 30)
+    button = Button('ボタンA', 10, 30)
     def on_mouse_click_button(self, btn):
         global count
         count += 1
-        text.text = f'{count}'
+        text.text = f'カウントを集計 {count}'
         text.color = pyxel.COLOR_RED
     button.on_click = on_mouse_click_button.__get__(button, Button)
     window.append(widget=button)
 
-    window2 = Window('MAIN WINDOW2', 20, 100, 100, 100)
+    window2 = Window('', 20, 100, 100, 100)
     def update_window2(self):
         self.x += 0.1
     window2.on_update = update_window2.__get__(window2, Window)
     gui.append(widget=window2)
 
-    image1 = Image(10, 10, 50, 50)
+    image1 = Image(10, 30, 50, 50)
     def draw_widget_image1(self):
         base_x = self.get_abs_x()
         base_y = self.get_abs_y()
