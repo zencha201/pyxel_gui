@@ -74,7 +74,7 @@ class Widget:
         '''
         マウス移動イベントハンドラ
         '''
-        for widget in self.widgets:
+        for widget in self.widgets[:]:
             if widget.x <= x and widget.y <= y and widget.x + widget.w >= x and widget.y + widget.h >= y:
                 widget.on_mouse_move(x - widget.x, y - widget.y)
     
@@ -82,7 +82,7 @@ class Widget:
         '''
         マウスボタンダウンイベントハンドラ
         '''
-        for widget in self.widgets:
+        for widget in self.widgets[:]:
             if widget.x <= x and widget.y <= y and widget.x + widget.w >= x and widget.y + widget.h >= y:
                 widget.on_mouse_down(btn, x - widget.x, y - widget.y)
                 widget.on_click(btn)
@@ -91,7 +91,7 @@ class Widget:
         '''
         マウスボタンアップイベントハンドラ
         '''
-        for widget in self.widgets:
+        for widget in self.widgets[:]:
             if widget.x <= x and widget.y <= y and widget.x + widget.w >= x and widget.y + widget.h >= y:
                 widget.on_mouse_up(btn, x - widget.x, y - widget.y)
     
@@ -147,7 +147,7 @@ class Widget:
         if self.enable:
             self.update_widget()
             self.on_update()
-            for widget in self.widgets:
+            for widget in self.widgets[:]:
                 widget.update()
     
     def draw_widget(self):
@@ -173,7 +173,7 @@ class Widget:
             
             self.draw_widget()
             self.on_draw()
-            for widget in self.widgets:
+            for widget in self.widgets[:]:
                 widget.draw()
                 
             # 描画範囲をリセット
