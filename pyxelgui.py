@@ -461,17 +461,5 @@ if __name__ == '__main__':
     image1.draw_widget = draw_widget_image1.__get__(image1, Image)
     window2.append(widget=image1)
 
-    def update():
-        '''
-        更新処理
-        '''
-        gui.update()
-
-    def draw():
-        '''
-        描画処理
-        '''
-        gui.draw()
-
     print('Start Python GUI test')
-    pyxel.run(update=update, draw=draw)
+    pyxel.run(update=gui.update, draw=gui.draw)
