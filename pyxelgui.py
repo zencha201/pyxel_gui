@@ -74,7 +74,7 @@ class Widget:
         '''
         マウス移動イベントハンドラ
         '''
-        for widget in self.widgets:
+        for widget in self.widgets[:]:
             if widget.x <= x and widget.y <= y and widget.x + widget.w >= x and widget.y + widget.h >= y:
                 widget.on_mouse_move(x - widget.x, y - widget.y)
     
@@ -82,7 +82,7 @@ class Widget:
         '''
         マウスボタンダウンイベントハンドラ
         '''
-        for widget in self.widgets:
+        for widget in self.widgets[:]:
             if widget.x <= x and widget.y <= y and widget.x + widget.w >= x and widget.y + widget.h >= y:
                 widget.on_mouse_down(btn, x - widget.x, y - widget.y)
                 widget.on_click(btn)
@@ -91,7 +91,7 @@ class Widget:
         '''
         マウスボタンアップイベントハンドラ
         '''
-        for widget in self.widgets:
+        for widget in self.widgets[:]:
             if widget.x <= x and widget.y <= y and widget.x + widget.w >= x and widget.y + widget.h >= y:
                 widget.on_mouse_up(btn, x - widget.x, y - widget.y)
     
@@ -147,7 +147,7 @@ class Widget:
         if self.enable:
             self.update_widget()
             self.on_update()
-            for widget in self.widgets:
+            for widget in self.widgets[:]:
                 widget.update()
     
     def draw_widget(self):
@@ -173,7 +173,7 @@ class Widget:
             
             self.draw_widget()
             self.on_draw()
-            for widget in self.widgets:
+            for widget in self.widgets[:]:
                 widget.draw()
                 
             # 描画範囲をリセット
@@ -461,17 +461,5 @@ if __name__ == '__main__':
     image1.draw_widget = draw_widget_image1.__get__(image1, Image)
     window2.append(widget=image1)
 
-    def update():
-        '''
-        更新処理
-        '''
-        gui.update()
-
-    def draw():
-        '''
-        描画処理
-        '''
-        gui.draw()
-
     print('Start Python GUI test')
-    pyxel.run(update=update, draw=draw)
+    pyxel.run(update=gui.update, draw=gui.draw)
