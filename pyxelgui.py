@@ -267,18 +267,41 @@ class Window(Widget):
     '''
     ウィンドウ
     '''
-    def __init__(self, text, x=0, y=0, w=100, h=80, color=0):
+    def __init__(self, text, x=0, y=0, w=100, h=80, close_button=False):
         super().__init__(x, y, w, h)
         self.text = text
         self.is_drag = False
         self.drag_start_mouse_x = 0
         self.drag_start_mouse_y = 0
+        
+        # クローズボタンが有効な場合は、Buttonを使用してクローズボタンを生成する
+        if close_button:
+            button = Button('X', 0, 0)
+            def update_widget(self):
+                super(Button,self).update_widget()
+                # 座標計算を上書きする
+                self.x = self.own.w - self.w
+                self.h = _WINDOW_TITLE_BAR_SIZE + 1
+            button.update_widget = update_widget.__get__(button, Button)
+            def on_mouse_up(self, btn, x ,y):
+                super(Button,self).on_mouse_up(btn, x ,y)
+                self.own.close()
+            button.on_mouse_up = on_mouse_up.__get__(button, Button)
+            self.append(widget=button)
     
     def close(self):
         '''
         ウィンドウを閉じる
         '''
-        self.own.remove(self)
+        if self.on_close():
+            self.own.remove(self)
+    
+    def on_close(self):
+        '''
+        クローズイベントハンドラ
+        戻り値がFalseの場合は、クローズしない
+        '''
+        return True
     
     def on_mouse_move(self, x, y):
         '''
@@ -299,8 +322,7 @@ class Window(Widget):
             # マウスカーソル位置(X,Y)とウィンドウの起点(X,Y)の差を記録する
             self.drag_start_mouse_x = pyxel.mouse_x - self.get_abs_x()
             self.drag_start_mouse_y = pyxel.mouse_y - self.get_abs_y()
-        else:
-            super().on_mouse_down(btn, x, y)
+        super().on_mouse_down(btn, x, y)
     
     def on_mouse_up(self, btn, x, y):
         '''
@@ -309,8 +331,7 @@ class Window(Widget):
         # ドラッグモード解除判定
         if self.is_drag == True:
             self.is_drag = False
-        else:
-            super().on_mouse_up(btn, x, y)
+        super().on_mouse_up(btn, x, y)
         
     def update_widget(self):
         if self.is_drag:
@@ -453,7 +474,7 @@ if __name__ == '__main__':
     button2.on_click = on_mouse_click_button2.__get__(button2, Button)
     window.append(widget=button2)
 
-    window2 = Window('MAIN WINDOW2', 20, 100, 100, 100)
+    window2 = Window('MAIN WINDOW2', 20, 100, 100, 100, close_button=True)
     def update_window2(self):
         if self.focus:
             if pyxel.btn(pyxel.KEY_UP):
