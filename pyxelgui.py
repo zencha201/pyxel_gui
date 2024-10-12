@@ -52,24 +52,6 @@ class Widget:
         '''
         self.focus = False
     
-    def on_key_down(self, key):
-        '''
-        キーダウンイベントハンドラ
-        '''
-        pass
-    
-    def on_key_up(self, key):
-        '''
-        キーアップイベントハンドラ
-        '''
-        pass
-    
-    def on_key_press(self, key):
-        '''
-        キー押下イベントハンドラ
-        '''
-        pass
-    
     def on_mouse_move(self, x, y):
         '''
         マウス移動イベントハンドラ
@@ -449,7 +431,15 @@ if __name__ == '__main__':
 
     window2 = Window('MAIN WINDOW2', 20, 100, 100, 100)
     def update_window2(self):
-        self.x += 0.1
+        if self.focus:
+            if pyxel.btn(pyxel.KEY_UP):
+                self.y -= 5
+            elif pyxel.btn(pyxel.KEY_DOWN):
+                self.y += 5
+            elif pyxel.btn(pyxel.KEY_RIGHT):
+                self.x += 5
+            elif pyxel.btn(pyxel.KEY_LEFT):
+                self.x -= 5
     window2.on_update = update_window2.__get__(window2, Window)
     gui.append(widget=window2)
 
