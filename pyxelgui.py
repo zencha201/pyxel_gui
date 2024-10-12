@@ -314,13 +314,18 @@ class Window(Widget):
         if self.focus:
             pyxel.rect(self.get_abs_x(), self.get_abs_y(), self.w, self.h, pyxel.COLOR_DARK_BLUE)
             pyxel.rect(self.get_abs_x() + 1, self.get_abs_y() + 1, self.w - 2, self.h - 2, pyxel.COLOR_LIGHT_BLUE)
+            pyxel.rect(self.get_abs_x() + 2, self.get_abs_y() + 2, self.w - 4, self.h - 4, pyxel.COLOR_WHITE)
+            pyxel.line(self.get_abs_x() + 1, self.get_abs_y() + _WINDOW_TITLE_BAR_SIZE - 1, self.get_abs_x() + self.w - 2, self.get_abs_y() + _WINDOW_TITLE_BAR_SIZE - 1, pyxel.COLOR_LIGHT_BLUE)
+            pyxel.line(self.get_abs_x() + 1, self.get_abs_y() + _WINDOW_TITLE_BAR_SIZE, self.get_abs_x() + self.w - 2, self.get_abs_y() + _WINDOW_TITLE_BAR_SIZE, pyxel.COLOR_DARK_BLUE)
+            pyxel.line(self.get_abs_x() + 1, self.get_abs_y() + _WINDOW_TITLE_BAR_SIZE + 1, self.get_abs_x() + self.w - 2, self.get_abs_y() + _WINDOW_TITLE_BAR_SIZE + 1, pyxel.COLOR_LIGHT_BLUE)
         else:
             pyxel.rect(self.get_abs_x(), self.get_abs_y(), self.w, self.h, pyxel.COLOR_DARK_BLUE)
             pyxel.rect(self.get_abs_x() + 1, self.get_abs_y() + 1, self.w - 2, self.h - 2, pyxel.COLOR_WHITE)
-        pyxel.rect(self.get_abs_x() + 2, self.get_abs_y() + 2, self.w - 4, self.h - 4, pyxel.COLOR_WHITE)
+            pyxel.rect(self.get_abs_x() + 2, self.get_abs_y() + 2, self.w - 4, self.h - 4, pyxel.COLOR_WHITE)
+            pyxel.line(self.get_abs_x() + 1, self.get_abs_y() + _WINDOW_TITLE_BAR_SIZE, self.get_abs_x() + self.w - 2, self.get_abs_y() + _WINDOW_TITLE_BAR_SIZE, pyxel.COLOR_DARK_BLUE)
         
         if len(self.text) > 0: # タイトルバー有無判定
-            pyxel.text(self.get_abs_x() + 2, self.get_abs_y() + 2, f'[ {self.text} ]', pyxel.COLOR_BLACK, _font)
+            pyxel.text(self.get_abs_x() + 3, self.get_abs_y() + 2, f'{self.text}', pyxel.COLOR_BLACK, _font)
 
 class Image(Widget):
     '''
@@ -423,10 +428,10 @@ if __name__ == '__main__':
     gui.append(widget=window)
 
     count = 0
-    text = Text('test', 5, 15, color=pyxel.COLOR_BLACK)
+    text = Text('test', 5, 20, color=pyxel.COLOR_BLACK)
     window.append(widget=text)
 
-    button = Button('ボタンA', 10, 30)
+    button = Button('ボタンA', 10, 40)
     def on_mouse_click_button(self, btn):
         global count
         count += 1
