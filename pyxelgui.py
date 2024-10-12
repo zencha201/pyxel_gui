@@ -274,6 +274,12 @@ class Window(Widget):
         self.drag_start_mouse_x = 0
         self.drag_start_mouse_y = 0
     
+    def close(self):
+        '''
+        ウィンドウを閉じる
+        '''
+        self.own.remove(self)
+    
     def on_mouse_move(self, x, y):
         '''
         マウス移動イベントハンドラ
@@ -440,6 +446,12 @@ if __name__ == '__main__':
         text.color = pyxel.COLOR_RED
     button.on_click = on_mouse_click_button.__get__(button, Button)
     window.append(widget=button)
+
+    button2 = Button('閉じる', 70, 40)
+    def on_mouse_click_button2(self, btn):
+        self.own.close()
+    button2.on_click = on_mouse_click_button2.__get__(button2, Button)
+    window.append(widget=button2)
 
     window2 = Window('MAIN WINDOW2', 20, 100, 100, 100)
     def update_window2(self):
