@@ -213,8 +213,14 @@ class PyxelGui(Widget):
         '''
         for widget in self.widgets[::-1]:
             if widget.x <= x and widget.y <= y and widget.x + widget.w >= x and widget.y + widget.h >= y:
+                # 一番手前のウィンドウにフォーカスが設定されていない場合、初回のフォーカス切り替え処理を行う
+                if not self.widgets[-1].focus: # 一番手前のウィンドウにフォーカスが設定されていない
+                    widget.on_focus()
+                    self.widgets.remove(widget)
+                    self.widgets.append(widget)
+                    
                 # 2番目以降のウィンドウの場合、フォーカス切り替え処理を行う
-                if self.widgets[-1] != widget: # 2番目以降のウィンドウ
+                elif self.widgets[-1] != widget: # 2番目以降のウィンドウ
                     self.widgets[-1].on_unfocus()
                     widget.on_focus()
                     self.widgets.remove(widget)
