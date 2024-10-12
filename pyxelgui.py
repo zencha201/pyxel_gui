@@ -166,12 +166,13 @@ class PyxelGui(Widget):
     画面構成上のトップレイヤー
     イベント配送処理は本関数内に実装する
     '''
-    def __init__(self, pyxel_ref=None, mouse=True, font_size=10):
+    def __init__(self, pyxel_ref=None, mouse=True, font_size=10, color=pyxel.COLOR_GRAY):
         if pyxel_ref != None:
             global pyxel
             pyxel = pyxel_ref
         super().__init__(0, 0, pyxel.width, pyxel.height)
         pyxel.mouse(mouse)
+        self.color = color
         
         # フォント処理
         global _font
@@ -260,7 +261,7 @@ class PyxelGui(Widget):
         pass
     
     def draw_widget(self):
-        pyxel.cls(pyxel.COLOR_GRAY)
+        pyxel.cls(self.color)
 
 class Window(Widget):
     '''
